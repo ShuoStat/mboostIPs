@@ -48,10 +48,26 @@ iteration are marked with a point. The path of the reference observation is
 depicted with a dashed vertical line.
 }
 \examples{
-# Assuming `result` is obtained from glmboostDrop1
-plot_vsPath(obj = result, ref = "orig", topN = 3)
-
-# To emphasize the top 5 influential observations using the mean as the reference
-plot_vsPath(obj = result, ref = "mean", topN = 5)
+data(golub99)
+X <- golub99$X
+X <- scale(X)
+y <- golub99$y
+set.seed(1) 
+foldid <- sample(rep(1:10, length = nrow(X)), nrow(X)) 
+cv <- sapply(1:max(foldid), function(x) as.numeric(foldid != x))
+obj <- mboost::glmboost(X, y,
+                family = Binomial(),
+                control = boost_control(mstop = 140,
+                                        nu = 0.1,
+                                        risk = "inbag"), 
+                                        center = F)
+drop1obj <- glmboostDrop1(obj,
+                          nCores = 1,
+                          fixMstop = NULL,
+                          aims = c("variableSelection", "prediction"),
+                          ref = "mean",
+                          folds = cv)
+plot_Scores(drop1obj)
+plot_Path(drop1obj, ref = "mean")
 
 }

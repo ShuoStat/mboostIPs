@@ -15,8 +15,8 @@ glmboostDrop1(
 )
 }
 \arguments{
-\item{obj}{An object of class \code{mboost} as returned by the \code{mboost} package functions.
-This is the model on which the drop-one analysis will be performed.}
+\item{obj}{An object of class \code{mboost} as returned by the \code{mboost} package
+functions. This is the model on which the drop-one analysis will be performed.}
 
 \item{nCores}{Integer specifying the number of cores to use for parallel execution.
 If \code{NULL}, the function will use one less than the total number of available cores.}
@@ -54,9 +54,9 @@ stopping iteration for each left-out observation.
 }
 }
 \description{
-The \code{glmboostDrop1} function performs a drop-one analysis for models fitted with
-gradient boosting, specifically targeting variable selection and prediction
-improvements. It can operate in parallel to speed up computations.
+The \code{glmboostDrop1} function performs a drop-one analysis for models fitted
+with gradient boosting, specifically targeting variable selection and
+prediction improvements. It can operate in parallel to speed up computations.
 }
 \details{
 The function performs a leave-one-out (LOO) analysis by iteratively re-fitting
@@ -66,9 +66,12 @@ difference in selected variables between the leave-one-out model and the
 reference. The reference can be the original model or the mean of all
 leave-one-out models. If the aim of the selection of
 
-with respect to a reference. This analysis helps in identifying the most influential observations.
+with respect to a reference. This analysis helps in identifying the most
+influential observations.
 }
 \examples{
+
+library(mboost)
 data(golub99)
 X <- golub99$X
 X <- scale(X)
@@ -90,4 +93,5 @@ drop1obj <- glmboostDrop1(obj,
                           folds = cv)
 plot_Scores(drop1obj)
 plot_Path(drop1obj, ref = "mean")
+
 }

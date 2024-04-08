@@ -76,3 +76,122 @@ lollipop <- function(x,
   abline(h = 0)
   
 }
+
+## cvrisk modified from mboost
+
+cvrisk_mboost <- function(object, folds = cv(model.weights(object)),
+                          grid = 0:mstop(object), papply = mclapply,
+                          fun = NULL, mc.preschedule = FALSE,
+                          ...) {
+  
+  papply <- match.fun(papply)
+  weights <- model.weights(object)
+  if (any(weights == 0))
+    warning("zero weights")
+  if (is.null(folds)) {
+    folds <- rmultinom(25, length(weights), weights/sum(weights))
+    attr(folds, "type") <- "25-fold bootstrap"
+  } else {
+    stopifnot(is.matrix(folds) && nrow(folds) == length(weights))
+  }
+  fitfct <- object$update
+  oobrisk <- matrix(0, nrow = ncol(folds), ncol = length(grid))
+  if (!is.null(fun))
+    stopifnot(is.function(fun))
+  fam_name <- object$family@name
+  call <- deparse(object$call)
+  if (is.null(fun)) {
+    dummyfct <- function(weights, oobweights) {
+      mod <- fitfct(weights = weights, oobweights = oobweights)
+      mstop(mod) <- max(grid)
+      ## return all risk values in grid (+ 1 as 0 is included)
+      risk(mod)[grid + 1]
+    }
+    if (fam_name == "Cox Partial Likelihood" && all(colSums(folds == 0) == 1))
+      stop("Leave-one-out cross-validation cannot be used with ", 
+           sQuote("family = CoxPH()"))
+    
+  } else { ## !is.null(fun)
+    dummyfct <- function(weights, oobweights) {
+      mod <- fitfct(weights = weights, oobweights = oobweights)
+      mod[max(grid)]
+      ## make sure dispatch works correctly
+      class(mod) <- class(object)
+      fun(mod)
+    }
+  }
+  
+  ## use case weights as out-of-bag weights (but set inbag to 0)
+  OOBweights <- matrix(rep(weights, ncol(folds)), ncol = ncol(folds))
+  OOBweights[folds > 0] <- 0
+  
+  if (identical(papply, mclapply)) {
+    oobrisk <- papply(1:ncol(folds),
+                      ## here changes,add  * weights
+                      function(i) try(dummyfct(weights = folds[, i] * weights,
+                                               oobweights = OOBweights[, i]),
+                                      silent = TRUE),
+                      mc.preschedule = mc.preschedule
+                      # ,...
+                      )
+  } else {
+    oobrisk <- papply(1:ncol(folds),
+                      ## here changes,add  * weights
+                      function(i) try(dummyfct(weights = folds[, i] * weights,
+                                               oobweights = OOBweights[, i]),
+                                      silent = TRUE),
+                      ...)
+  }
+  ## if any errors occured remove results and issue a warning
+  if (any(idx <- sapply(oobrisk, is.character))) {
+    warning(sum(idx), " fold(s) encountered an error. ",
+            "Results are based on ", ncol(folds) - sum(idx),
+            " folds only.\n",
+            "Original error message(s):\n",
+            sapply(oobrisk[idx], function(x) x))
+    oobrisk[idx] <- NA
+  }
+  if (!is.null(fun))
+    return(oobrisk)
+  
+  oobrisk <- t(as.data.frame(oobrisk))
+  
+  ## here changes
+  oobrisk <- oobrisk / colSums(OOBweights)
+  colnames(oobrisk) <- grid
+  rownames(oobrisk) <- 1:nrow(oobrisk)
+  attr(oobrisk, "risk") <- fam_name
+  attr(oobrisk, "call") <- call
+  attr(oobrisk, "mstop") <- grid
+  attr(oobrisk, "type") <- ifelse(!is.null(attr(folds, "type")),
+                                  attr(folds, "type"), "user-defined")
+  class(oobrisk) <- "cvrisk"
+  oobrisk
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

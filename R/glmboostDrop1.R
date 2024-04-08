@@ -3,12 +3,12 @@
 #' glmboostDrop1 Function
 #'
 #' @description
-#' The `glmboostDrop1` function performs a drop-one analysis for models fitted with 
-#' gradient boosting, specifically targeting variable selection and prediction 
-#' improvements. It can operate in parallel to speed up computations.
+#' The `glmboostDrop1` function performs a drop-one analysis for models fitted 
+#' with gradient boosting, specifically targeting variable selection and 
+#' prediction improvements. It can operate in parallel to speed up computations.
 #'
-#' @param obj An object of class `mboost` as returned by the `mboost` package functions.
-#' This is the model on which the drop-one analysis will be performed.
+#' @param obj An object of class `mboost` as returned by the `mboost` package 
+#' functions. This is the model on which the drop-one analysis will be performed.
 #' @param nCores Integer specifying the number of cores to use for parallel execution.
 #' If `NULL`, the function will use one less than the total number of available cores.
 #' @param fixMstop Optional; an integer specifying using a fixed mstop 
@@ -33,7 +33,8 @@
 #' reference. The reference can be the original model or the mean of all 
 #' leave-one-out models. If the aim of the selection of 
 #' 
-#' with respect to a reference. This analysis helps in identifying the most influential observations.
+#' with respect to a reference. This analysis helps in identifying the most 
+#' influential observations.
 #'
 #' @return A list with three elements:
 #' - `vsScore`: A numeric vector of scores indicating the influence 
@@ -47,6 +48,8 @@
 #'    stopping iteration for each left-out observation.
 #'
 #' @examples
+#' 
+#' library(mboost)
 #' data(golub99)
 #' X <- golub99$X
 #' X <- scale(X)
@@ -68,10 +71,10 @@
 #'                           folds = cv)
 #' plot_Scores(drop1obj)
 #' plot_Path(drop1obj, ref = "mean")
-
-
+#' 
 #' @importFrom parallel detectCores
 #' @import doParallel
+#' @import foreach
 #' @import mboost
 #' @export glmboostDrop1
 
@@ -82,11 +85,13 @@ glmboostDrop1 <- function(obj,
                                    "prediction"),
                           ref = c("mean", "orig."),
                           folds = NULL, 
-                          ... ){
+                          ...){
   
   # argument checking
   stopifnot(inherits(obj, "glmboost"))
-  folds <- cv(model.weights(object))
+  
+  if(is.null(folds))
+    folds <- cv(model.weights(obj))
   
   # sample size
   n <- length(obj$`(weights)`)
@@ -100,8 +105,7 @@ glmboostDrop1 <- function(obj,
   cl <- makeCluster(ncores)
   registerDoParallel(cl)
   
-  cvboost <- foreach(k = 0:(n), 
-                     .packages = c("mboost")) %dopar% {
+  cvboost <- foreach(k = 0:n, .packages = "mboost") %dopar% {
                        
                        # set the deleted case with zero weight
                        wts <- rep(1, n)
@@ -110,18 +114,24 @@ glmboostDrop1 <- function(obj,
                        wts <- wts * obj$`(weights)`
                        
                        # allicate new weights
-                       newObj <- obj$update(weights = wts)
+                       newObj <- obj$update(weights = wts, 
+                                            # oobweights = wts,
+                                            risk = obj$control$risk)
                        
                        if ((!is.null(fixMstop)) & 
-                           ("variableSelection" %in% aims)) {
+                           identical("variableSelection", aims)) {
                          cvm = NULL
-                         optmMstop = NULL
+                         optmMstop = fixMstop
                        } else {
-                         cvs <- do.call(cvrisk, 
-                                        args = c(list("object" = newObj), 
-                                                 list("folds" = folds),
+                         cvs <- do.call(cvrisk_mboost, 
+                                        args = c(list("object" = newObj,
+                                                      folds = folds), 
                                                  list(...)))
-                         optmMstop <- mstop(cvs)
+                         if (is.null(fixMstop))
+                           optmMstop <- mstop(cvs)
+                         else
+                           optmMstop <- fixMstop
+                         
                          # output cvm even if needed
                          cvm <- colMeans(cvs)
                        }
