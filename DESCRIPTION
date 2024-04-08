@@ -22,7 +22,8 @@ Depends:
 Imports: 
     doParallel,
     foreach,
-    mboost
+    mboost,
+    parallel
 Suggests: 
     knitr,
     rmarkdown,
