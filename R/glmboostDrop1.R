@@ -72,7 +72,7 @@
 #' plot_Scores(drop1obj)
 #' plot_Path(drop1obj, ref = "mean")
 #' 
-#' @importFrom parallel detectCores
+#' @import parallel
 #' @import doParallel
 #' @import foreach
 #' @import mboost
