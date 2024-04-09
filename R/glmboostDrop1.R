@@ -26,15 +26,15 @@
 #' @param ... Additional arguments passed on to cvrisk. see `mboost` package.
 #'
 #' @details
-#' The function performs a leave-one-out (LOO) analysis by iteratively re-fitting 
-#' the model with one observation left out and evaluating the effect on 
-#' variable selection or prediction. For variable selection, it calculates the 
-#' difference in selected variables between the leave-one-out model and the
-#' reference. The reference can be the original model or the mean of all 
-#' leave-one-out models. If the aim of the selection of 
-#' 
-#' with respect to a reference. This analysis helps in identifying the most 
-#' influential observations.
+#' The function conducts a leave-one-out (LOO) analysis by re-fitting the model 
+#' iteratively with one observation removed, and examining the impact on variable 
+#' selection or prediction. In the case of variable selection, the function 
+#' calculates the difference in selected variables between the leave-one-out 
+#' model and the reference model, which can either be the original model or 
+#' the mean of all leave-one-out models. If the goal is prediction, the function 
+#' compares the mean of cross-validation error between the leave-one-out model 
+#' and a reference model. The function also allows for parallel running by 
+#' specifying the number of CPU cores.
 #'
 #' @return A list with three elements:
 #' - `vsScore`: A numeric vector of scores indicating the influence 
