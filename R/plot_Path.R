@@ -113,7 +113,7 @@ plot_Path <- function(obj,
     at <- mat[nrow(mat), ordTopN]
     mtext(ordTopN, side = 4, at = at, line = 0, las = 2, cex = 0.7)
     axis(side = 3, at = mstops[topN + 1], tick = T, cex = 0.6,  tcl = 0.3, labels = F)
-    mtext(ordTopN, side = 3, at = mstops[topN + 1], line = 0, cex = 0.7)
+    mtext(ordTopN, side = 3, at = mstops[ordTopN + 1], line = 0, cex = 0.7)
     
     #- add labels
     mtext("Boosting iterations", line = 2.2, side = 1)
