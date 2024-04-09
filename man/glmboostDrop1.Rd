@@ -84,7 +84,7 @@ obj <- glmboost(X, y,
                 control = boost_control(mstop = 140,
                                         nu = 0.1,
                                         risk = "inbag"), 
-                                        center = F)
+                                        center = FALSE)
 drop1obj <- glmboostDrop1(obj,
                           nCores = 1,
                           fixMstop = NULL,

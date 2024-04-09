@@ -37,6 +37,8 @@ Default is an empty string.}
 
 \item{xlab}{A character string specifying the label for the x-axis.
 The default label is "Observations".}
+
+\item{...}{Other arguments.}
 }
 \description{
 This function plots a set of scores against their observation indices,
@@ -69,7 +71,7 @@ obj <- glmboost(X, y,
                 control = boost_control(mstop = 140,
                                         nu = 0.1,
                                         risk = "inbag"), 
-                                        center = F)
+                                        center = FALSE)
 drop1obj <- glmboostDrop1(obj,
                           nCores = 1,
                           fixMstop = NULL,
@@ -78,5 +80,4 @@ drop1obj <- glmboostDrop1(obj,
                           folds = cv)
 plot_Scores(drop1obj)
 plot_Path(drop1obj, ref = "mean")
-
 }

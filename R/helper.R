@@ -85,7 +85,7 @@ cvrisk_mboost <- function(object, folds = cv(model.weights(object)),
                           ...) {
   
   papply <- match.fun(papply)
-  weights <- model.weights(object)
+  weights <- stats::model.weights(object)
   if (any(weights == 0))
     warning("zero weights")
   if (is.null(folds)) {

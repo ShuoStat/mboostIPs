@@ -54,21 +54,21 @@ obj <- mboost::glmboost(X, y,
 
 load("./testthat/correctResults.RData")
 drop1obj.mean_test <- glmboostDrop1(obj,
-                                    nCores = 8,
+                                    nCores = 1,
                                     fixMstop = NULL,
                                     aims = c("variableSelection", "prediction"),
                                     ref = "mean",
                                     folds = cv)
 
 drop1obj.orig_test <- glmboostDrop1(obj,
-                                    nCores = 8,
+                                    nCores = 1,
                                     fixMstop = NULL,
                                     aims = c("variableSelection", "prediction"),
                                     ref = "orig.",
                                     folds = cv)
 
 drop1obj.mean.fixed_test <- glmboostDrop1(obj,
-                                          nCores = 8,
+                                          nCores = 1,
                                           fixMstop = 100,
                                           aims = c("variableSelection", "prediction"),
                                           ref = "mean",
@@ -76,7 +76,7 @@ drop1obj.mean.fixed_test <- glmboostDrop1(obj,
 
 
 drop1obj.orig.fixed_test <- glmboostDrop1(obj,
-                                          nCores = 8,
+                                          nCores = 1,
                                           fixMstop = 100,
                                           aims = c("variableSelection", "prediction"),
                                           ref = "orig.",

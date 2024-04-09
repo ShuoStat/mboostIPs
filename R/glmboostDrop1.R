@@ -62,7 +62,7 @@
 #'                 control = boost_control(mstop = 140,
 #'                                         nu = 0.1,
 #'                                         risk = "inbag"), 
-#'                                         center = F)
+#'                                         center = FALSE)
 #' drop1obj <- glmboostDrop1(obj,
 #'                           nCores = 1,
 #'                           fixMstop = NULL,
@@ -76,6 +76,7 @@
 #' @import doParallel
 #' @import foreach
 #' @import mboost
+#' @importFrom stats  model.weights rmultinom sd
 #' @export glmboostDrop1
 
 glmboostDrop1 <- function(obj, 
@@ -105,11 +106,11 @@ glmboostDrop1 <- function(obj,
   cl <- makeCluster(ncores)
   registerDoParallel(cl)
   
-  cvboost <- foreach(k = 0:n, .packages = "mboost") %dopar% {
+  cvboost <- foreach(i = 0:n, .packages = "mboost") %dopar% {
                        
                        # set the deleted case with zero weight
                        wts <- rep(1, n)
-                       wts[k] <- 0
+                       wts[i] <- 0
                        # combine wts and original weight
                        wts <- wts * obj$`(weights)`
                        
@@ -139,7 +140,7 @@ glmboostDrop1 <- function(obj,
                        # output selected variables, even not needed
                        vs <- newObj$xselect()
                        
-                       out <- list("obs" = k,
+                       out <- list("obs" = i,
                                    "vs" = vs,
                                    "cvm" = cvm,
                                    "mstop" = optmMstop)

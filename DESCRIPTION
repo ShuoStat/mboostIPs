@@ -17,14 +17,16 @@ License: GPL-3
 URL: https://github.com/ShuoStat/mboostIPs
 BugReports: https://github.com/ShuoStat/mboostIPs
 Depends: 
-    graphics,
-    R (>= 4.3.3)
+    R (>= 4.2)
 Imports: 
     doParallel,
     foreach,
+    graphics,
     mboost,
-    parallel
+    parallel,
+    stats
 Suggests: 
+    BiocStyle,
     knitr,
     rmarkdown,
     testthat (>= 3.0.0)

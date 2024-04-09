@@ -21,6 +21,7 @@
 #' Default is an empty string.
 #' @param xlab A character string specifying the label for the x-axis. 
 #' The default label is "Observations".
+#' @param ... Other arguments.
 #'
 #' @details
 #' The function creates a Lollipop plot for the influential scores. The input 
@@ -47,7 +48,7 @@
 #'                 control = boost_control(mstop = 140,
 #'                                         nu = 0.1,
 #'                                         risk = "inbag"), 
-#'                                         center = F)
+#'                                         center = FALSE)
 #' drop1obj <- glmboostDrop1(obj,
 #'                           nCores = 1,
 #'                           fixMstop = NULL,
@@ -56,7 +57,7 @@
 #'                           folds = cv)
 #' plot_Scores(drop1obj)
 #' plot_Path(drop1obj, ref = "mean")
-#' 
+#' @importFrom graphics abline axis box lines mtext plot.new plot.window points text
 #' @export plot_Scores
 
 plot_Scores <- function(obj,

@@ -31,6 +31,7 @@
 #' depicted with a dashed vertical line.
 #'
 #' @examples 
+#' library(mboost)
 #' data(golub99)
 #' X <- golub99$X
 #' X <- scale(X)
@@ -43,7 +44,7 @@
 #'                 control = boost_control(mstop = 140,
 #'                                         nu = 0.1,
 #'                                         risk = "inbag"), 
-#'                                         center = F)
+#'                                         center = FALSE)
 #' drop1obj <- glmboostDrop1(obj,
 #'                           nCores = 1,
 #'                           fixMstop = NULL,
@@ -52,7 +53,7 @@
 #'                           folds = cv)
 #' plot_Scores(drop1obj)
 #' plot_Path(drop1obj, ref = "mean")
-#'
+#' @importFrom graphics abline axis box lines mtext plot.new plot.window points text
 #' @export plot_Path
 
 plot_Path <- function(obj, 
